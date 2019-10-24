@@ -42,7 +42,7 @@ jobs:
       - attach_workspace: {at: .}
       - aws-s3/sync:
           from: build
-          to: s3://flex-plugin-starter/dist/
+          to: s3://marcoslombog.com-staging
           overwrite: true 
 
 workflows:
