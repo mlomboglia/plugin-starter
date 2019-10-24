@@ -13,7 +13,7 @@ class SignalView extends React.Component {
     super();
     this.state = {
       attributes: {},
-      logLevel: 'error'
+      logLevel: 'trace'
     }
   }
 
