@@ -43,7 +43,6 @@ jobs:
       - aws-s3/sync:
           from: build
           to: s3://flex-plugin-starter/dist/
-          arguments: --acl public-read
           overwrite: true 
 
 workflows:
