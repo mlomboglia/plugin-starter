@@ -42,7 +42,7 @@ jobs:
       - attach_workspace: {at: .}
       - aws-s3/sync:
           from: build
-          to: s3://flex-plugin-starter
+          to: s3://flex-plugin-starter/dist/${CIRCLE_BRANCH}/
           overwrite: true 
 
 workflows:
