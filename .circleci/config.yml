@@ -45,6 +45,17 @@ jobs:
           to: s3://flex-plugin-starter/dist/${CIRCLE_BRANCH}/
           overwrite: true 
 
+      - run:
+          name: Rollbar notification
+          command: |
+            curl https://api.rollbar.com/api/1/deploy/ \
+                -F access_token=${ROLLBAR_TOKEN} \
+                -F environment=production \
+                -F revision=${CIRCLE_SHA1} \
+                -F rollbar_username=${CIRCLE_USERNAME} \
+                -F local_username=${CIRCLE_USERNAME} \
+                -F comment="${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH} by ${CIRCLE_USERNAME}"
+
 workflows:
   version: 2.1
   build-deploy:
