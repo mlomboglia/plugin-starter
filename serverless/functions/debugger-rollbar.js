@@ -46,6 +46,7 @@ const getPayload = (event) => {
 }
 
 exports.handler = (context, event, callback) => {
+    console.log('rollbar init');
     const rollbarConfig = Object.assign({}, event.rollbar, {
         environment: 'production'
     });
