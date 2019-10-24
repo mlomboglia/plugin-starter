@@ -44,7 +44,7 @@ export default class StarterPlugin extends FlexPlugin {
   registerLogger() {
     this.Rollbar = new Rollbar({
       reportLevel: 'debug',
-      accessToken: '751a5d217402480cadc0b963e6bf1d83', // Clientside rollbar token, not sensitive, aggressively ratelimited
+      accessToken: '59ef8e73db524cc89204016684c8f56a', // Clientside rollbar token, not sensitive, aggressively ratelimited
       captureUncaught: true,
       captureUnhandledRejections: true,
       payload: {
