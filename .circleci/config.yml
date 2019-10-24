@@ -1,0 +1,57 @@
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.11
+
+executors:
+  node:
+    docker:
+      - image: circleci/node:12.6.0 
+  python:
+    docker:
+      - image: circleci/python:2.7
+
+jobs:
+  build:
+    working_directory: ~/flex-plugin-starter
+    executor: node
+    steps:
+      - checkout
+      - run: cp public/appConfig.example.js public/appConfig.js
+      - run: sed -i "s/\'accountSid\'/\'${ACCOUNT_SID}\'/g" public/appConfig.js
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+      - run: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - run: npm run test
+      - run: npm run build
+      - store_artifacts: {path: build}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build 
+
+  deploy:
+    executor: python 
+    steps:
+      - checkout
+      - attach_workspace: {at: .}
+      - aws-s3/sync:
+          from: build
+          to: s3://flex-plugin-starter/dist/${CIRCLE_BRANCH}/
+          arguments: --acl public-read
+          overwrite: true 
+
+workflows:
+  version: 2.1
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+
