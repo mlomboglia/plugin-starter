@@ -11,7 +11,7 @@ Afterwards, install the dependencies by running `npm install`:
 ```bash
 cd 
 
-# If you use npm
+# If you use npm 
 npm install
 ```
 
