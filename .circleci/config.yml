@@ -11,13 +11,16 @@ executors:
       - image: circleci/python:2.7
 
 jobs:
-  build:
+  deploy-plugin:
     working_directory: ~/flex-plugin-starter
     executor: node
+    parameters:
+      stage_name:
+        type: string
     steps:
       - checkout
       - run: cp public/appConfig.example.js public/appConfig.js
-      - run: sed -i "s/\'accountSid\'/\'${ACCOUNT_SID}\'/g" public/appConfig.js
+      - run: sed -i "s/\'accountSid\'/\'<< parameters.stage_name >>_${ACCOUNT_SID}\'/g" public/appConfig.js
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -42,7 +45,7 @@ jobs:
       - attach_workspace: {at: .}
       - aws-s3/sync:
           from: build
-          to: s3://flex-plugin-starter/dist/${CIRCLE_BRANCH}/
+          to: s3://flex-plugin-starter/dist/<< parameters.stage_name >>/
           overwrite: true 
 
       - run:
@@ -50,7 +53,7 @@ jobs:
           command: |
             curl https://api.rollbar.com/api/1/deploy/ \
                 -F access_token=${ROLLBAR_TOKEN} \
-                -F environment=production \
+                -F environment=<< parameters.stage_name >> \
                 -F revision=${CIRCLE_SHA1} \
                 -F rollbar_username=${CIRCLE_USERNAME} \
                 -F local_username=${CIRCLE_USERNAME} \
@@ -60,8 +63,21 @@ workflows:
   version: 2.1
   build-deploy:
     jobs:
-      - build
-      - deploy:
-          requires:
-            - build
+      # non-master branches deploy to the 'dev' stage
+      - deploy-plugin:
+          name: Deploy Plugin DEV
+          stage_name: dev
+          context: Development
+          filters:
+            branches:
+              ignore: master
+
+      # master branch deploy to the 'prod' stage
+      - deploy-plugin:
+          name: Deploy Plugins PRD
+          stage_name: prd
+          context: Production
+          filters:
+            branches:
+              only: master
 
