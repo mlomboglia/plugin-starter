@@ -63,11 +63,9 @@ workflows:
   version: 2.1
   build-deploy:
     jobs:
-      - build
       # non-master branches deploy to the 'dev' stage
       - deploy-plugin:
-          requires:
-            - build
+          - build
           name: Deploy Plugin DEV
           stage_name: dev
           context: Development
@@ -77,8 +75,7 @@ workflows:
 
       # master branch deploy to the 'prod' stage
       - deploy-plugin:
-          requires:
-            - build
+          - build
           name: Deploy Plugins PRD
           stage_name: prd
           context: Production
