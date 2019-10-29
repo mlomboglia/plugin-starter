@@ -50,7 +50,7 @@ jobs:
       - attach_workspace: {at: .}
       - aws-s3/sync:
           from: build
-          to: s3://flex-plugin-starter/dist/dev/
+          to: s3://flex-plugin-starter/dist/prd/
           overwrite: true
 
 
