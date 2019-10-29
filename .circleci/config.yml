@@ -49,12 +49,12 @@ jobs:
 
   deploy_production:
     executor: python 
-      steps:
-        - attach_workspace: {at: .}
-        - aws-s3/sync:
-            from: build
-            to: s3://flex-plugin-starter/dist/dev/
-            overwrite: true
+    steps:
+      - attach_workspace: {at: .}
+      - aws-s3/sync:
+          from: build
+          to: s3://flex-plugin-starter/dist/dev/
+          overwrite: true
 
 
 workflows:
