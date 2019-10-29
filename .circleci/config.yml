@@ -38,48 +38,41 @@ jobs:
           paths:
             - build 
 
-  deploy-plugin:
+  deploy_staging:
     executor: python 
     steps:
-      - checkout
       - attach_workspace: {at: .}
       - aws-s3/sync:
           from: build
-          to: s3://flex-plugin-starter/dist/<< parameters.stage_name >>/
+          to: s3://flex-plugin-starter/dist/dev/
           overwrite: true 
 
-      - run:
-          name: Rollbar notification
-          command: |
-            curl https://api.rollbar.com/api/1/deploy/ \
-                -F access_token=${ROLLBAR_TOKEN} \
-                -F environment=<< parameters.stage_name >> \
-                -F revision=${CIRCLE_SHA1} \
-                -F rollbar_username=${CIRCLE_USERNAME} \
-                -F local_username=${CIRCLE_USERNAME} \
-                -F comment="${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH} by ${CIRCLE_USERNAME}"
+  deploy_production:
+    executor: python 
+      steps:
+        - attach_workspace: {at: .}
+        - aws-s3/sync:
+            from: build
+            to: s3://flex-plugin-starter/dist/dev/
+            overwrite: true
+
 
 workflows:
   version: 2.1
   build-deploy:
     jobs:
-      # non-master branches deploy to the 'dev' stage
-      - deploy-plugin:
-          - build
-          name: Deploy Plugin DEV
-          stage_name: dev
-          context: Development
-          filters:
-            branches:
-              ignore: master
-
-      # master branch deploy to the 'prod' stage
-      - deploy-plugin:
-          - build
-          name: Deploy Plugins PRD
-          stage_name: prd
-          context: Production
+      - build
+      - deploy_staging:
+          requires:
+            - build
           filters:
             branches:
               only: master
+      - confirm_deploy:
+          type: approval
+          requires:
+            - deploy_staging
+      - deploy_production:
+          requires:
+            - confirm_deploy
 
