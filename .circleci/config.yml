@@ -11,7 +11,7 @@ executors:
       - image: circleci/python:2.7
 
 jobs:
-  deploy-plugin:
+  build:
     working_directory: ~/flex-plugin-starter
     executor: node
     parameters:
@@ -38,7 +38,7 @@ jobs:
           paths:
             - build 
 
-  deploy:
+  deploy-plugin:
     executor: python 
     steps:
       - checkout
@@ -63,8 +63,11 @@ workflows:
   version: 2.1
   build-deploy:
     jobs:
+      - build
       # non-master branches deploy to the 'dev' stage
       - deploy-plugin:
+          requires:
+            - build
           name: Deploy Plugin DEV
           stage_name: dev
           context: Development
@@ -74,6 +77,8 @@ workflows:
 
       # master branch deploy to the 'prod' stage
       - deploy-plugin:
+          requires:
+            - build
           name: Deploy Plugins PRD
           stage_name: prd
           context: Production
