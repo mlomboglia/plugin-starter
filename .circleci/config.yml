@@ -14,13 +14,10 @@ jobs:
   build:
     working_directory: ~/flex-plugin-starter
     executor: node
-    parameters:
-      stage_name:
-        type: string
     steps:
       - checkout
       - run: cp public/appConfig.example.js public/appConfig.js
-      - run: sed -i "s/\'accountSid\'/\'<< parameters.stage_name >>_${ACCOUNT_SID}\'/g" public/appConfig.js
+      - run: sed -i "s/\'accountSid\'/\'${ACCOUNT_SID}\'/g" public/appConfig.js
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
