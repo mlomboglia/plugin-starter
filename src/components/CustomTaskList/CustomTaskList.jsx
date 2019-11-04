@@ -10,7 +10,7 @@ const CustomTaskList = (props) => {
 
   return (
     <CustomTaskListComponentStyles>
-      This is a flow demo component -- Marcos
+      This is a flow demo component - Marcos
       <i className="accented" onClick={props.dismissBar}>
         close
       </i>
